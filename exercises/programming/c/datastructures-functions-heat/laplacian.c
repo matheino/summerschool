@@ -40,7 +40,13 @@ int main(void)
 
     // Evaluate the Laplacian
     // *INDENT-OFF*
-#error Add the missing part
+
+    for (i = 1; i < 258; i++){
+      for(j = 1; j < 258;j++){
+        array[i][j] = 
+(array[i-1][j]-2*array[i][j]+array[i+1][j])/(0.01*0.01)+(array[i][j-1]-2*array[i][j]+array[i][j+1])/(0.01*0.01);
+      }
+    }
  
     // *INDENT-ON*
 

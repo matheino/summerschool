@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 int main(int argc, char *argv[])
 {
@@ -9,8 +10,16 @@ int main(int argc, char *argv[])
    // initialize necessary array elements and write the for loop
 
    printf("First 20 Fibonacci numbers are:\n");
-   for (i=0; i < 20; i++) {
-       printf("%d ", f[i]);
+   
+   
+   f[0] = 1;
+
+   for (i=1; i < 21; i++) {
+       
+
+       f[i] = f[i-1]+i;
+       
+       printf("%d ", f[i-1]);
    }
 
    printf("\n"); 
