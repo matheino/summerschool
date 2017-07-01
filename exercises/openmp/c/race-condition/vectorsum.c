@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <omp.h>
 #define NX 102400
 
 int main(void)
@@ -15,10 +15,18 @@ int main(void)
 
     sum = 0.0;
     /* TODO: Parallelize computation */
+
+#pragma omp parallel shared(vecA,sum)
+{
+#pragma omp for schedule(static) reduction(+:sum)
+
     for (i = 0; i < NX; i++) {
         sum += vecA[i];
     }
+}
     printf("Sum: %ld\n",sum);
+
+
 
     return 0;
 }

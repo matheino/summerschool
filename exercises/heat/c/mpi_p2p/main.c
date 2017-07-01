@@ -5,9 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <mpi.h>
-
 #include "heat.h"
-
 
 int main(int argc, char **argv)
 {
@@ -17,7 +15,7 @@ int main(int argc, char **argv)
     double dt;                  //!< Time step
     int nsteps;                 //!< Number of time steps
 
-    int image_interval = 500;    //!< Image output interval
+    int image_interval = 100;    //!< Image output interval
 
     parallel_data parallelization; //!< Parallelization info
 
@@ -28,7 +26,11 @@ int main(int argc, char **argv)
     double start_clock;        //!< Time stamps
 
     /* TODO start: initialize MPI */
-
+    int ntasks;
+    int myid;
+    MPI_Init(&argc,&argv);
+    MPI_Comm_rank(MPI_COMM_WORLD,&myid);
+    MPI_Comm_size(MPI_COMM_WORLD,&ntasks);
     /* TODO end */
 
     initialize(argc, argv, &current, &previous, &nsteps, &parallelization);
@@ -65,7 +67,7 @@ int main(int argc, char **argv)
     finalize(&current, &previous);
 
     /* TODO start: finalize MPI */
-
+    MPI_Finalize();
     /* TODO end */
 
     return 0;

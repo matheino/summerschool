@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <omp.h>
 #include "heat.h"
 
 
@@ -24,6 +24,10 @@ int main(int argc, char **argv)
 
     clock_t start_clock;        //!< Time stamps
 
+#pragma omp parallel
+{
+#pragma single
+{
     initialize(argc, argv, &current, &previous, &nsteps);
 
     /* Output the initial field */
@@ -36,17 +40,24 @@ int main(int argc, char **argv)
 
     /* Get the start time stamp */
     start_clock = clock();
-
+}
     /* Time evolve */
+
+#pragma omp for schedule(static) shared(current, previous, a, dt, image_interval)
     for (iter = 1; iter < nsteps; iter++) {
         evolve(&current, &previous, a, dt);
         if (iter % image_interval == 0) {
+        #pragma single{
             write_field(&current, iter);
+        }
         }
         /* Swap current field so that it will be used
             as previous for next iteration step */
+        #pragma single
         swap_fields(&current, &previous);
     }
+
+} // pragma omp parallel
 
     /* Determine the CPU time used for the iteration */
     printf("Iteration took %.3f seconds.\n", (double)(clock() - start_clock) /

@@ -1,0 +1,54 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+create_array{
+  for (i=0; i<258;i++){
+    for(j=0; j<258;i++){
+      if(i == 0){
+        array[i][j] = 85;
+
+      }else if(i == 257){
+        array[i][j] = 5;
+
+      }else if(j == 0){
+        array[i][j] = 20;
+
+      }else if(j == 257){
+        array[i][j] = 70;
+
+      }else{
+        array[i][j] = 0;
+      }
+    }
+  }
+}
+
+
+
+int main(void){
+  
+  struct T_field {
+  
+    int nx = 256;
+    int ny = 256;
+    float dx = 0.01;
+    float dy = 0.01;
+    float dx2 = 0.01*0.01;
+    float dy2 = 0.01*0.01;
+    float array[258][258];
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+
+
+}
