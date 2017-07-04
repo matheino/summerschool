@@ -28,13 +28,18 @@ int main(int argc, char **argv)
     /* TODO start: initialize MPI */
     int ntasks;
     int myid;
-    MPI_Init(&argc,&argv);
+    int required = MPI_THREAD_FUNNELED;
+    int provided;
+    MPI_Init_thread(&argc,&argv,required,&provided);
     MPI_Comm_rank(MPI_COMM_WORLD,&myid);
     MPI_Comm_size(MPI_COMM_WORLD,&ntasks);
-    /* TODO end */
 
+#pragma omp parallel private(iter)
+{
     initialize(argc, argv, &current, &previous, &nsteps, &parallelization);
 
+#pragma omp single
+    {
     /* Output the initial field */
     write_field(&current, 0, &parallelization);
 
@@ -45,18 +50,23 @@ int main(int argc, char **argv)
 
     /* Get the start time stamp */
     start_clock = MPI_Wtime();
+    } //single
 
     /* Time evolve */
     for (iter = 1; iter < nsteps; iter++) {
+#pragma omp single
         exchange(&previous, &parallelization);
         evolve(&current, &previous, a, dt);
         if (iter % image_interval == 0) {
+#pragma omp single
           write_field(&current, iter, &parallelization);
         }
         /* Swap current field so that it will be used
             as previous for next iteration step */
+#pragma omp single
         swap_fields(&current, &previous);
     }
+} // close #pragma omp
 
     /* Determine the CPU time used for the iteration */
     if (parallelization.rank == 0) {
@@ -65,7 +75,6 @@ int main(int argc, char **argv)
     }
 
     finalize(&current, &previous);
-
     /* TODO start: finalize MPI */
     MPI_Finalize();
     /* TODO end */

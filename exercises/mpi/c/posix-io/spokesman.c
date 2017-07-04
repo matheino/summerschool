@@ -53,7 +53,26 @@ void single_writer(int my_id, int *localvector, int localsize)
 
     /* TODO: Implement a function that will write the data to file so that
        a single process does the file io. Use rank WRITER_ID as the io rank */
+    MPI_Status status;    
+    int ntasks_temp; 
+    ntasks_temp = DATASIZE/localsize;
 
+    fullvector = malloc(ntasks_temp*localsize*sizeof(int));     
+
+    if(my_id == WRITER_ID){
+      int i;
+      for (i=1; i < ntasks_temp; i++){
+        MPI_Recv(&fullvector + i*localsize*sizeof(int),localsize,MPI_INT,i,1000,MPI_COMM_WORLD,&status);
+      }
+      fp = fopen("vector2.txt","a+");
+      for(i = 0; i < ntasks_temp*localsize; i++){
+        fprintf(fp,"%d\n",fullvector[i]);
+      }
+      fclose(fp);
+    }
+    else{
+      MPI_Send(localvector,localsize,MPI_INT,WRITER_ID,1000,MPI_COMM_WORLD);
+    }
     free(fullvector);
 }
 

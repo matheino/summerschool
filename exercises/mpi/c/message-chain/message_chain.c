@@ -30,14 +30,17 @@ int main(int argc, char *argv[])
 
     /* TODO start */
     /* Send and receive messages as defined in exercise */
+
+    MPI_Request request;
+
     if (myid < ntasks - 1) {
-        MPI_Send(message,size,MPI_INT,myid+1,myid,MPI_COMM_WORLD);
+        MPI_Isend(message,size,MPI_INT,myid+1,myid,MPI_COMM_WORLD,&request);
         printf("Sender: %d. Sent elements: %d. Tag: %d. Receiver: %d\n",
                myid, size, myid + 1, myid + 1);
     }
 
     if (myid > 0) {
-        MPI_Recv(receiveBuffer,size,MPI_INT,myid-1,myid-1,MPI_COMM_WORLD,&status);
+        MPI_Irecv(receiveBuffer,size,MPI_INT,myid-1,myid-1,MPI_COMM_WORLD,&request);
         printf("Receiver: %d. first element %d.\n",
                myid, receiveBuffer[0]);
     }

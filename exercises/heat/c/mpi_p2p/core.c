@@ -21,11 +21,25 @@ void exchange(field *temperature, parallel_data *parallel)
     int lower = parallel->ndown;
     int upper = parallel->nup;
 
-    // Send to the up, receive from down    
+    MPI_Status status;
+    MPI_Request request;
+
+    // Send to the up receive from down
+    MPI_Isend(data1,size,MPI_DOUBLE,upper,1,MPI_COMM_WORLD,&request);
+    MPI_Irecv(receiveBuffer1,size,MPI_DOUBLE,lower,MPI_ANY_TAG,MPI_COMM_WORLD,&request);
+    MPI_Wait(&request,&status);
+    // Send to down, receive from up
+    MPI_Isend(data2,size,MPI_DOUBLE,lower,1,MPI_COMM_WORLD,&request);
+    MPI_Irecv(receiveBuffer2,size,MPI_DOUBLE,upper,MPI_ANY_TAG,MPI_COMM_WORLD,&request);
+    MPI_Wait(&request,&status);
+
+
+/*    // Send to the up, receive from down    
     MPI_Sendrecv(data1,size,MPI_DOUBLE,upper,1,receiveBuffer1, size, MPI_DOUBLE,lower,MPI_ANY_TAG,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
     // Send to the down, receive from up
     MPI_Sendrecv(data2,size,MPI_DOUBLE,lower,1,
-                 receiveBuffer2,size,MPI_DOUBLE,upper,MPI_ANY_TAG,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+    receiveBuffer2,size,MPI_DOUBLE,upper,MPI_ANY_TAG,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+*/
     /* TODO end */
 
 }
@@ -42,6 +56,7 @@ void evolve(field *curr, field *prev, double a, double dt)
      * are not updated. */
     dx2 = prev->dx * prev->dx;
     dy2 = prev->dy * prev->dy;
+#pragma omp for private(i,j)
     for (i = 1; i < curr->nx + 1; i++) {
         for (j = 1; j < curr->ny + 1; j++) {
             curr->data[i][j] = prev->data[i][j] + a * dt *

@@ -29,19 +29,46 @@ int main(int argc, char *argv[])
 
     /* Initialize message buffers */
     init_buffers(sendbuf, recvbuf, 2 * NTASKS);
-
+    
     /* Print data that will be sent */
     print_buffers(printbuf, sendbuf, 2 * NTASKS);
-
+    
     /* TODO: use a single collective communication call (and maybe prepare
      *       some parameters for the call) */
 
+    MPI_Request request;
+    MPI_Status status;
+
+//    MPI_Ibcast(sendbuf,NTASKS*2,MPI_INT,0,MPI_COMM_WORLD,&request);
+
+//    MPI_Iscatter(sendbuf,2,MPI_INT,recvbuf,2,MPI_INT,0,MPI_COMM_WORLD,&request);    
+
+//    int recvdisp[4] = {0, 1, 2, 4};
+//  int recvcnts[4] = {1, 1, 2, 4};
+
+//  MPI_Igatherv(sendbuf+recvcnts[rank],recvcnts[rank],MPI_INT,recvbuf,recvcnts,recvdisp,MPI_INT,1,MPI_COMM_WORLD,&request);
+
+
+    if (rank <  2){
+    color = 2;
+    }else {
+    color = 1;
+    }
+
+    MPI_Comm_split(MPI_COMM_WORLD,color,rank,&sub_comm);
+    MPI_Ireduce(sendbuf,recvbuf,NTASKS*2,MPI_INT,MPI_SUM,1,sub_comm,&request);
+    MPI_Wait(&request,&status);
+    
+//    MPI_Ialltoall(sendbuf,2,MPI_INT,recvbuf,2,MPI_INT,MPI_COMM_WORLD,&request);
+//    MPI_Wait(&request,&status);
+
     /* Print data that was received */
     /* TODO: add correct buffer */
-    print_buffers(printbuf, ... , 2 * NTASKS);
+    print_buffers(printbuf, recvbuf , 2 * NTASKS);
 
     MPI_Finalize();
     return 0;
+
 }
 
 

@@ -6,6 +6,8 @@ int main(int argc, char **argv)
     int rank;
     int array[8][8];
     //TODO: Declare a variable storing the MPI datatype 
+    MPI_Datatype newtype;
+    MPI_Status status;
 
     int i, j;
 
@@ -29,10 +31,20 @@ int main(int argc, char **argv)
 
 
     //TODO: Create datatype that describes one column. Use MPI_Type_vector.
-    
+    MPI_Type_vector(8,1,8,MPI_INT,&newtype);
+    MPI_Type_commit(&newtype);
+
+   
     //TODO: Send first column of matrix form rank 0 to rank 1
+    if (rank == 0){
+    MPI_Send(array,1,newtype,1,11,MPI_COMM_WORLD);
+    }
+    else if (rank == 1){
+    MPI_Recv(array,1,newtype,0,11,MPI_COMM_WORLD,&status);
+    }
 
     //TODO: free datatype
+    MPI_Type_free(&newtype);
 
     // Print out the result on rank 1
     // The application is correct if the first column has the values of rank 0

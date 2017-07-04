@@ -9,11 +9,12 @@ int main(int argc, char* argv[]) {
     int coords[2];    /* Coordinates in the grid */
     int neighbors[4]; /* Neighbors in 2D grid */
     int period[2] = {1, 1};
-    MPI_Comm comm2d;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &ntasks);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_id);
+    MPI_Comm comm2d;
+
 
     /* Determine the process grid (dims[0] x dims[1] = ntasks) */
     if (ntasks < 16) {
@@ -36,12 +37,17 @@ int main(int argc, char* argv[]) {
 
     /* Create the 2D Cartesian communicator */
     /* TO DO */
+    MPI_Cart_create(MPI_COMM_WORLD,2,dims,period,0,&comm2d);
 
     /* Find out and store the neighboring ranks */
     /* TO DO */
-
+    
+    MPI_Cart_shift(comm2d,0,1,&neighbors[0],&neighbors[1]);
+    MPI_Cart_shift(comm2d,1,1,&neighbors[2],&neighbors[3]);
     /* Find out and store also the Cartesian coordinates of a rank */
     /* TO DO */
+    MPI_Cart_coords(comm2d,my_id,0,&coords[0]);
+    MPI_Cart_coords(comm2d,my_id,1,&coords[1]);
 
     for (irank = 0; irank < ntasks; irank++) {
         if (my_id == irank) {
